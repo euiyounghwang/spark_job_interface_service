@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 from starlette.middleware.cors import CORSMiddleware
-from controller import job_controller
+from controller import job_controller, download_controller
 from config.log_config import create_log
 
 logger = create_log()
@@ -78,4 +78,7 @@ async def root_with_param(id):
 '''
 
 # router
+''' Enter the host name of the master node in the spark cluster to collect the list of running spark jobs. '''
 app.include_router(job_controller.app, tags=["SparkJob API"], )
+'''Create Excel file after receiving a list of spark jobs running in the entire environment.. '''
+app.include_router(download_controller.app, tags=["Download API"], )
