@@ -57,7 +57,7 @@ class JobHandler(object):
 
 
     async def get_download_sparkjobs(self):
-        ''' query '''
+        ''' get_download_sparkjobs '''
         try:
 
             # result_json_value = database_object.excute_oracle_query(oas_query.get("sql"))
@@ -75,7 +75,7 @@ class JobHandler(object):
             # )
 
             df = pd.DataFrame(
-                [["Dev#1", "Dev spark job", "localhost", "localhost", "test_job"], ["Dev#2", "Dev spark job", "localhost", "localhost", "test_job"]], 
+                [["Dev#1", "Dev spark job Dev spark job Dev spark job", "localhost", "localhost", "test_job"], ["Dev#2", "Dev spark job", "localhost", "localhost", "test_job"]], 
                 columns=["Environment", "Description", "Server Name", "IP Address", "Job_Active_&_Online"]
             )
             

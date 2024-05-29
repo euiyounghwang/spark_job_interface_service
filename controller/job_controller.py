@@ -109,9 +109,6 @@ async def get_download_sparkjobs():
             workbook  = writer.book
             worksheet = writer.sheets['Sheet1']
 
-            # Set the column width and format.
-            # worksheet.set_column(1, 1, 18, None)
-
             header_format = workbook.add_format( # !!! here workable, no error
                 {
                     'bold': True,
@@ -124,11 +121,18 @@ async def get_download_sparkjobs():
                 }
             )
 
+            column_settings = [{'header': column} for column in df.columns]
+            (max_row, max_col) = df.shape
+
+            # worksheet.add_table(0, 0, max_row, max_col - 1, {'columns': column_settings})
+
             # Write the column headers with the defined format.
             for col_num, value in enumerate(df.columns.values):
-                worksheet.write(0, col_num + 1, value, header_format)
-
-            worksheet.autofit()
+                worksheet.write(0, col_num, value, header_format)
+                worksheet.autofilter(0, 0, max_row, max_col - 1)
+                worksheet.autofit()
+                col_num += 1
+            
         
         return StreamingResponse(
             BytesIO(buffer.getvalue()),
