@@ -27,7 +27,9 @@ async def generate_excel_sparkjob():
         StartTime = datetime.datetime.now()
         
         logger.info("generate_excel_sparkjob")
-        df = await JobHandlerInject.get_download_sparkjobs()
+
+        ''' response df with sparkjob position that's status is N'''
+        lookup, df = await JobHandlerInject.get_download_sparkjobs()
         
         EndTime = datetime.datetime.now()
         Delay_Time = str((EndTime - StartTime).seconds) + '.' + str((EndTime - StartTime).microseconds).zfill(6)[:2]
@@ -65,27 +67,40 @@ async def generate_excel_sparkjob():
                 {
                     'bold': True,
                     'text_wrap': True,
-                    # 'valign': 'top',
+                    'valign': 'top',
                     'valign': 'center',
                     # 'fg_color': '#D7E4BC',
-                    'bg_color': '#edbd93',
+                    # 'bg_color': '#edbd93',
+                    'bg_color': 'yellow',
                     'border': 1
                 }
             )
 
-            column_settings = [{'header': column} for column in df.columns]
+            # column_settings = [{'header': column} for column in df.columns]
             (max_row, max_col) = df.shape
 
             # worksheet.add_table(0, 0, max_row, max_col - 1, {'columns': column_settings})
+            frm2 = workbook.add_format({'bold': True,'bg_color': 'yellow',})
 
             # Write the column headers with the defined format.
             for col_num, value in enumerate(df.columns.values):
+                # print(col_num, value)
                 worksheet.write(0, col_num, value, header_format)
                 worksheet.autofilter(0, 0, max_row, max_col - 1)
                 worksheet.autofit()
                 col_num += 1
-            
-        
+                # worksheet.set_column('A:A',None,frm2)  
+
+            # print(max_col,  max_row, df.values.tolist(), len(df.values))\
+            ''' lookup the position each environment that jobs are not running'''
+            # lookup_no_run_jobs = [3,5]
+
+            ''' response df with sparkjob position that's status is N'''
+            frm2 = workbook.add_format({'bold': True,'bg_color': 'yellow',})
+            for row in lookup:
+                # print(df.values.tolist()[int(row)-2])
+                worksheet.write_row("A{}:F{}".format(str(row), str(row)), df.values.tolist()[int(row)-2], frm2)            
+
         return StreamingResponse(
             BytesIO(buffer.getvalue()),
             media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',

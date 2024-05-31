@@ -150,9 +150,10 @@ class JobHandler(object):
         '''
         try:
             results = []
+            lookup = []
             # sparkjob_name_list = ["StreamProcessEXP", "ArchiveProcess_OMx_EXP", "ArchiveElasticDelete_OMx_EXP", "ArchiveProcess_WMx_EXP", "ArchiveElasticDelete_WMx_EXP"]
             sparkjob_name_list = self.sparkjob_list
-            for v in self.hosts.values():
+            for index, v in enumerate(self.hosts.values()):
                 ''' get hostname as master node in cluster for sparkjob'''
                 master_node = v[2]
                 ''' add a list of spark jobs on each node'''
@@ -168,6 +169,11 @@ class JobHandler(object):
                         # print("--#1 ", each_rows)
                         results.append(each_rows)
                         # print("--#2 ", results)
+
+                    ''' response df with sparkjob position that's status is N'''
+                    ''' set color with bold format as many as the number of spark jobs'''
+                    for i in range(0, len(sparkjob_name_list)):
+                        lookup.append(index*int(len(sparkjob_name_list)) + 2 + i)
                     continue
 
                 # print(f"# list_of_sparkjobs - {list_of_sparkjobs}")
@@ -180,6 +186,7 @@ class JobHandler(object):
                 
                 ''' add basic metas'''
                 ''' looking for the active spark job which is in list_of_spark_job_name among all sparkjob_name_list'''
+                is_running_list = []
                 for each_job_name in sparkjob_name_list:
                     each_rows = []
                     for element in v:
@@ -187,21 +194,30 @@ class JobHandler(object):
                     if each_job_name in list_of_spark_job_name:
                         each_rows.append(each_job_name)
                         each_rows.append("Y")
+                        is_running_list.append("Y")
                     else:
                         each_rows.append(each_job_name)
                         each_rows.append("N")
+                        is_running_list.append("N")
                     results.append(each_rows)
+                
+                ''' response df with sparkjob position that's status is N'''
+                ''' set color with bold format as many as the number of spark jobs'''
+                if list(set(is_running_list)) == ['N']:
+                    for i in range(0, len(sparkjob_name_list)):
+                        lookup.append(index*int(len(sparkjob_name_list)) + 2 + i)
                 
             # self.get_active_spark_job
             self.logger.info(results)
-            
+            self.logger.info(f"No running jobs : ~@### -> {lookup}")
+
             df = pd.DataFrame(
                 # [['Dev#1', "Dev spark job Dev spark job Dev spark job", "localhost", "localhost", "test_job", "Y"], ["Dev#2", "Dev spark job", "localhost", "localhost", "test_job", "N"]], 
                 results,
                 columns=["Environment", "Description", "Server Name", "IP Address", "Spark_Job_Name", "Job_Active_&_Online"]
             )
 
-            return df
+            return lookup, df
             # return {}
         
         except Exception as e:
