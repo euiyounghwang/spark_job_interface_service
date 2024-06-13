@@ -51,6 +51,7 @@ WantedBy=default.target
 
 # Service command
 sudo systemctl daemon-reload 
+sudo systemctl enable sparkjob_interface_api.service 
 sudo systemctl start sparkjob_interface_api.service 
 sudo systemctl status sparkjob_interface_api.service 
 sudo systemctl stop sparkjob_interface_api.service 
