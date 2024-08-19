@@ -4,7 +4,8 @@ from service.status_handler import (StatusHanlder, StatusException)
 import requests
 from fastapi import Response
 import pandas as pd
-
+import warnings
+warnings.filterwarnings("ignore")
 
 
 class JobHandler(object):
@@ -40,7 +41,7 @@ class JobHandler(object):
 
             self.logger.info(f"get_active_spark_job : {spark_url}")
              # -- make a call to master node to get the information of activeapps
-            resp = requests.get(url=spark_url, timeout=5)
+            resp = requests.get(url=spark_url, timeout=60, verify=False)
             
             if not (resp.status_code == 200):
                 return None
@@ -51,7 +52,7 @@ class JobHandler(object):
             if resp_working_job:
                 self.logger.info(f"activeapps - {resp_working_job}")
                 return resp_working_job
-            return None
+            return []
         
         except Exception as e:
            return StatusException.raise_exception(str(e))
