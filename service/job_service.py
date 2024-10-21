@@ -41,7 +41,7 @@ class JobHandler(object):
 
             self.logger.info(f"get_active_spark_job : {spark_url}")
              # -- make a call to master node to get the information of activeapps
-            resp = requests.get(url=spark_url, timeout=60, verify=False)
+            resp = requests.get(url=spark_url, timeout=5, verify=False)
             
             if not (resp.status_code == 200):
                 return None
